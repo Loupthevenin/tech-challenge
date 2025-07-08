@@ -12,5 +12,19 @@ services:
     volumes:
       - opensearch-data:/usr/share/opensearch/data
 
+  fastapi-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: fastapi-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/app:/app
+    env_file:
+      - .env
+    depends_on:
+      - opensearch-node
+
 volumes:
   opensearch-data:
