@@ -21,11 +21,17 @@ error() {
 
 set -e
 
+info "Installing npm dependencies..."
 npm install
+success "Dependencies installed."
 
+info "Building the frontend app..."
 npm run build
+success "Build completed."
 
+info "Installing 'serve' globally..."
 npm install -g serve
+success "'serve' installed."
 
-# TODO: utiliser var d'env
+info "Starting the server on port 3000..."
 serve -s dist -l 3000

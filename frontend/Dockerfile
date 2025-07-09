@@ -8,7 +8,6 @@ COPY ./script.sh /tmp
 
 WORKDIR /app
 
-# TODO: utiliser var d'env
 EXPOSE 3000
 
 ENTRYPOINT ["tini", "--"]

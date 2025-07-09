@@ -36,7 +36,7 @@ services:
       dockerfile: Dockerfile
     container_name: frontend
     ports:
-      - "${FRONTEND_PORT-3000}:3000"
+      - "${FRONTEND_PORT:-3000}:3000"
     volumes:
       - ./frontend/app:/app
     env_file:
