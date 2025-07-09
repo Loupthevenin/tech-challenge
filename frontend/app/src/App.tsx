@@ -6,8 +6,10 @@ import axios from "axios";
 import LogFilters from "./components/LogFilters";
 import LogList from "./components/LogList";
 import LogForm from "./components/LogForm";
+import { useDebounce } from "./hooks/useDebounce";
+import type { JSX } from "react/jsx-dev-runtime";
 
-function App() {
+function App(): JSX.Element {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -16,6 +18,8 @@ function App() {
   const [filterLevel, setFilterLevel] = useState<LogLevel | "">("");
   const [filterService, setFilterService] = useState<string>("");
 
+  const debouncedSearch = useDebounce(search, 500);
+
   // Fetch GET logs
   const fetchLogs = useCallback(async () => {
     setLoading(true);
@@ -23,7 +27,7 @@ function App() {
 
     try {
       const params: Record<string, string> = {};
-      if (search.trim()) params.q = search.trim();
+      if (debouncedSearch.trim()) params.q = debouncedSearch.trim();
       if (filterLevel) params.level = filterLevel;
       if (filterService) params.service = filterService;
 
@@ -41,7 +45,7 @@ function App() {
     } finally {
       setLoading(false);
     }
-  }, [search, filterLevel, filterService]);
+  }, [debouncedSearch, filterLevel, filterService]);
 
   useEffect(() => {
     fetchLogs();
