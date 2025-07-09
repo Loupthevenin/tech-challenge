@@ -1,9 +1,19 @@
 from fastapi import FastAPI, Query
+from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional, List
 from models import LogEntry, LogEntryInDB
 from opensearch_client import index_log, search_logs
 
 app: FastAPI = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    # En prod on doit remplacer par VITE_API_BASE_URL
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.post("/logs", response_model=LogEntryInDB)
@@ -38,6 +48,5 @@ def search(
     Returns:
         List[LogEntry]: List of matching logs without OpenSearch metadata.
     """
-    results: List[LogEntryInDB] = search_logs(
-        q=q, level=level, service=service)
+    results: List[LogEntryInDB] = search_logs(q=q, level=level, service=service)
     return [LogEntry(**r.model_dump(exclude={"id"})) for r in results]
