@@ -2,6 +2,10 @@ services:
   opensearch-node:
     image: opensearchproject/opensearch:2.11.1
     container_name: opensearch-node
+    # On active 'init: true' pour utiliser tini en tant que PID 1
+    # Cela permet de bien gérer la propagation des signaux SIGINT/SIGTERM
+    # et d’éviter les longs délais à l’arrêt du conteneur.
+    init: true
     environment:
       - discovery.type=single-node
       - "DISABLE_SECURITY_PLUGIN=true"
