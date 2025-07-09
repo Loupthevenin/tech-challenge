@@ -11,7 +11,7 @@ export interface LogEntry {
   service: string;
 }
 
-export type NewLog = LogEntry;
+export type NewLog = Omit<LogEntry, "timestamp">;
 
 export interface LogListProps {
   logs: LogEntry[];

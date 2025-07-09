@@ -10,13 +10,11 @@ import {
 } from "../types";
 
 const INITIAL_LOG: NewLog = {
-  timestamp: new Date().toISOString(),
   level: "INFO",
   message: "",
   service: "",
 };
 
-// TODO: laisser le back s'occuper du timestamp;
 export default function LogForm({
   onSubmitSuccess,
 }: LogFormProps): JSX.Element {
@@ -33,7 +31,6 @@ export default function LogForm({
       alert("Log submitted");
       setNewLog({
         ...INITIAL_LOG,
-        timestamp: new Date().toISOString(),
       });
       onSubmitSuccess();
     } catch (error) {
