@@ -29,8 +29,8 @@ def ingest_log(log: LogEntryCreate) -> LogEntryInDB:
         LogEntryInDB: The indexed log entry, including the generated ID.
     """
     log_data: LogEntry = LogEntry(**log.dict(), timestamp=datetime.now(timezone.utc))
-    result = index_log(log_data=log_data)
-    return LogEntryInDB(id=result["_id"], **log_data)
+    result = index_log(log_data=log_data.dict())
+    return LogEntryInDB(id=result["_id"], **log_data.dict())
 
 
 @app.get("/logs/search", response_model=List[LogEntry])
