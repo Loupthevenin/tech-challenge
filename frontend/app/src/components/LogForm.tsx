@@ -2,21 +2,25 @@ import type { JSX } from "react/jsx-dev-runtime";
 import { useState } from "react";
 import axios from "axios";
 import { VITE_API_BASE_URL } from "../config";
-import { LEVELS, type LogEntry } from "../types";
+import {
+  LEVELS,
+  type LogEntry,
+  type NewLog,
+  type LogFormProps,
+} from "../types";
 
-interface LogFormProps {
-  onSubmitSuccess: () => void;
-}
+const INITIAL_LOG: NewLog = {
+  timestamp: new Date().toISOString(),
+  level: "INFO",
+  message: "",
+  service: "",
+};
 
+// TODO: laisser le back s'occuper du timestamp;
 export default function LogForm({
   onSubmitSuccess,
 }: LogFormProps): JSX.Element {
-  const [newLog, setNewLog] = useState({
-    timestamp: new Date().toISOString(),
-    level: "INFO",
-    message: "",
-    service: "",
-  });
+  const [newLog, setNewLog] = useState<NewLog>(INITIAL_LOG);
 
   // POST logs
   const handleSubmit = async (e: React.FormEvent) => {
@@ -28,12 +32,12 @@ export default function LogForm({
       await axios.post(`${VITE_API_BASE_URL}/logs`, newLog);
       alert("Log submitted");
       setNewLog({
-        ...newLog,
-        message: "",
+        ...INITIAL_LOG,
         timestamp: new Date().toISOString(),
       });
       onSubmitSuccess();
-    } catch {
+    } catch (error) {
+      console.error("Failed to submit log:", error);
       alert("Failed to submit log");
     }
   };

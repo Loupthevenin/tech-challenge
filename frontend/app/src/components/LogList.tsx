@@ -1,11 +1,5 @@
 import type { JSX } from "react/jsx-dev-runtime";
-import type { LogEntry } from "../types";
-
-interface LogListProps {
-  logs: LogEntry[];
-  loading: boolean;
-  error: string | null;
-}
+import type { LogListProps } from "../types";
 
 export default function LogList({
   logs,

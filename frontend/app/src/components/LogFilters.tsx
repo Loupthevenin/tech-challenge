@@ -1,14 +1,6 @@
 import type { JSX } from "react/jsx-dev-runtime";
 import { LEVELS, SERVICES, type LogLevel } from "../types";
-
-interface LogFiltersProps {
-  search: string;
-  setSearch: (val: string) => void;
-  filterLevel: LogLevel | "";
-  setFilterLevel: (val: LogLevel | "") => void;
-  filterService: string;
-  setFilterService: (val: string) => void;
-}
+import type { LogFiltersProps } from "../types";
 
 export default function LogFilters({
   search,
