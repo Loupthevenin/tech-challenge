@@ -1,0 +1,8 @@
+{
+  "reportMissingTypeStubs": false,
+  "reportOptionalSubscript": false,
+  "reportUnknownMemberType": false,
+  "reportUnknownVariableType": false,
+  "reportMissingImports": false,
+  "typeCheckingMode": "basic"
+}
