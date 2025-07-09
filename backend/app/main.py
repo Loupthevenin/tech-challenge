@@ -23,7 +23,7 @@ def ingest_log(log: LogEntryCreate) -> LogEntryInDB:
     Ingest a new log entry and index it into OpenSearch.
 
     Args:
-        log (LogEntry): The log data submitted in the request body.
+        log (LogEntryCreate): The log data submitted in the request body.
 
     Returns:
         LogEntryInDB: The indexed log entry, including the generated ID.
