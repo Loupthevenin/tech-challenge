@@ -53,9 +53,9 @@ def search_logs(
     if q:
         must.append({"match": {"message": q}})
     if level:
-        must.append({"term": {"level": level}})
+        must.append({"term": {"level.keyword": level}})
     if service:
-        must.append({"term": {"service": service}})
+        must.append({"term": {"service.keyword": service}})
 
     if not must:
         query = {"match_all": {}}
@@ -65,6 +65,7 @@ def search_logs(
     query_body = {
         "query": query,
         "sort": [{"timestamp": {"order": "desc"}}],
+        "size": 20,
     }
 
     response = client.search(index=index_name, body=query_body)
