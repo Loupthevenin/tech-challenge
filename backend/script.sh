@@ -21,22 +21,22 @@ error() {
 
 set -e
 
-if [ ! -d ".venv" ]; then
-	info "Création d'un environnement virtuel..."
+if [ ! -d "venv" ]; then
+	info "Creating virtual environment..."
 	python3 -m venv venv
-	success "Environnement virtuel créé."
+	success "Virtual environment created."
 else
-	info "Environnement virtuel déjà présent"
+	info "Virtual environment already exists."
 fi
 
-info "Activation de l'environnement virtual"
+info "Activating virtual environment..."
 source venv/bin/activate
-success "Environnement virtuel activé."
+success "Virtual environment activated."
 
-info "Installation des dépendances..."
+info "Installing dependencies..."
 pip install --upgrade pip
 pip install --no-cache-dir -r requirements.txt
-success "Dépendances installées."
+success "Dependencies installed."
 
-info "Lancement de FastAPI..."
+info "Starting FastAPI server..."
 uvicorn main:app --host "${FASTAPI_HOST}" --port "${FASTAPI_PORT}"

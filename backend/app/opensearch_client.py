@@ -1,6 +1,7 @@
+from models import LogEntry, LogEntryInDB
 from opensearchpy import OpenSearch
-from typing import List, Dict, Any
-from datetime import datetime
+from typing import List, Optional
+from datetime import datetime, timezone
 import os
 
 client: OpenSearch = OpenSearch(
@@ -14,39 +15,60 @@ client: OpenSearch = OpenSearch(
 )
 
 
-def index_log(log_data: Dict[str, Any]) -> Dict[str, Any]:
-    today: str = datetime.utcnow().strftime("%Y.%m.%d")
+def index_log(log_data: LogEntry) -> dict:
+    """
+    Index a single log entry into OpenSearch.
+
+    Args:
+        log_data (LogEntry): The validated log data to be indexed.
+
+    Returns:
+        dict: The OpenSearch indexing response.
+    """
+    today: str = datetime.now(timezone.utc).strftime("%Y.%m.%d")
     index_name: str = f"logs-{today}"
-    response: Dict[str, Any] = client.index(index=index_name, body=log_data)
+    response: dict = client.index(index=index_name, body=log_data)
     return response
 
 
 def search_logs(
-    q: str = None, level: str = None, service: str = None
-) -> List[Dict[str, Any]]:
-    today: str = datetime.utcnow().strftime("%Y.%m.%d")
+    q: Optional[str] = None, level: Optional[str] = None, service: Optional[str] = None
+) -> List[LogEntryInDB]:
+    """
+    Search log entries in OpenSearch based on optional filters.
+
+    Args:
+        q (Optional[str]): Full-text search on the message field.
+        level (Optional[str]): Filter by log level (e.g., INFO, ERROR).
+        service (Optional[str]): Filter by service name.
+
+    Returns:
+        List[LogEntryInDB]: A list of matching log entries.
+    """
+    today: str = datetime.now(timezone.utc).strftime("%Y.%m.%d")
     index_name: str = f"logs-{today}"
 
-    must_clauses: List[Dict[str, Any]] = []
+    must = []
 
     if q:
-        must_clauses.append({"match": {"message": q}})
+        must.append({"match": {"message": q}})
     if level:
-        must_clauses.append({"term": {"level": level}})
+        must.append({"term": {"level": level}})
     if service:
-        must_clauses.append({"term": {"service": service}})
+        must.append({"term": {"service": service}})
 
-    if not must_clauses:
-        must_clauses = [{"match_all": {}}]
+    if not must:
+        query = {"match_all": {}}
+    else:
+        query = {"bool": {"must": must}}
 
-    query_body: Dict[str, Any] = {
-        "query": {
-            "bool": {"must": must_clauses}
-            if must_clauses
-            else {"must": [{"match_all": []}]}
-        },
+    query_body = {
+        "query": query,
         "sort": [{"timestamp": {"order": "desc"}}],
     }
 
-    response: Dict[str, Any] = client.search(index=index_name, body=query_body)
-    return response["hits"]["hits"]
+    response = client.search(index=index_name, body=query_body)
+    return [
+        LogEntryInDB(**hit["_source"], id=hit["_id"])
+        for hit in response["hits"]["hits"]
+    ]
