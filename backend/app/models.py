@@ -26,6 +26,24 @@ class LogEntry(BaseModel):
     )
 
 
+class LogEntryCreate(BaseModel):
+    level: Literal["INFO", "WARNING", "ERROR", "DEBUG"] = Field(
+        ...,
+        description="Log level",
+        example="INFO",
+    )
+    message: constr(min_length=1) = Field(
+        ...,
+        description="Log message content",
+        example="User login successful",
+    )
+    service: constr(min_length=1) = Field(
+        ...,
+        description="Service name (ex: api-gateway, user-service)",
+        example="api-gateway",
+    )
+
+
 class LogEntryInDB(LogEntry):
     id: str = Field(
         ...,

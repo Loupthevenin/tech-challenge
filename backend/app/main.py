@@ -1,7 +1,8 @@
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional, List
-from models import LogEntry, LogEntryInDB
+from models import LogEntry, LogEntryCreate, LogEntryInDB
+from datetime import datetime, timezone
 from opensearch_client import index_log, search_logs
 
 app: FastAPI = FastAPI()
@@ -17,7 +18,7 @@ app.add_middleware(
 
 
 @app.post("/logs", response_model=LogEntryInDB)
-def ingest_log(log: LogEntry) -> LogEntryInDB:
+def ingest_log(log: LogEntryCreate) -> LogEntryInDB:
     """
     Ingest a new log entry and index it into OpenSearch.
 
@@ -27,8 +28,9 @@ def ingest_log(log: LogEntry) -> LogEntryInDB:
     Returns:
         LogEntryInDB: The indexed log entry, including the generated ID.
     """
-    result = index_log(log.dict())
-    return LogEntryInDB(id=result["_id"], **log.model_dump())
+    log_data: LogEntry = LogEntry(**log.dict(), timestamp=datetime.now(timezone.utc))
+    result = index_log(log_data=log_data)
+    return LogEntryInDB(id=result["_id"], **log_data)
 
 
 @app.get("/logs/search", response_model=List[LogEntry])
