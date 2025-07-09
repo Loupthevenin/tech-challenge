@@ -1,5 +1,22 @@
+# Environnements
 .env
+*.env
 *.log
-node_modules
+
+# Python
 venv/
-__pycache__
+__pycache__/
+*.py[cod]
+
+# Node.js / Frontend
+node_modules/
+dist/
+.vite/
+.cache/
+*.tsbuildinfo
+
+# OS / éditeurs
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
