@@ -59,10 +59,12 @@ async def ingest_log(log: LogEntryCreate) -> LogEntryInDB:
     Returns:
         LogEntryInDB: The indexed log entry, including the generated ID.
     """
-    log_data: LogEntry = LogEntry(**log.dict(), timestamp=datetime.now(timezone.utc))
-    result = index_log(log_data=log_data.dict())
-    await manager.broadcast(jsonable_encoder(log_data.dict()))
-    return LogEntryInDB(id=result["_id"], **log_data.dict())
+    log_data: LogEntry = LogEntry(
+        **log.model_dump(), timestamp=datetime.now(timezone.utc)
+    )
+    result = index_log(log_data=log_data.model_dump())
+    await manager.broadcast(jsonable_encoder(log_data.model_dump()))
+    return LogEntryInDB(id=result["_id"], **log_data.model_dump())
 
 
 @app.get("/logs/search", response_model=List[LogEntry])

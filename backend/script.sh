@@ -19,6 +19,16 @@ error() {
 	echo -e "${RED}[ERROR]${END} $1"
 }
 
+wait_for_opensearch() {
+	info "Waiting for OpenSearch to be available at ${OPENSEARCH_HOST}:${OPENSEARCH_PORT}..."
+	until curl -s "http://${OPENSEARCH_HOST}:${OPENSEARCH_PORT}" >/dev/null; do
+		echo -n "."
+		sleep 2
+	done
+	echo ""
+	success "OpenSearch is up and running!"
+}
+
 set -e
 
 if [ ! -d "venv" ]; then
@@ -37,6 +47,18 @@ info "Installing dependencies..."
 pip install --upgrade pip
 pip install --no-cache-dir -r requirements.txt
 success "Dependencies installed."
+
+wait_for_opensearch
+
+# Run tests only in dev environment
+if [ "$APP_ENV" = "development" ]; then
+	info "Running unit tests (APP_ENV=development)..."
+	PYTHONPATH=. pytest || {
+		error "Tests failed."
+		exit 1
+	}
+	success "All tests passed."
+fi
 
 info "Starting FastAPI server..."
 uvicorn main:app --host "${FASTAPI_HOST}" --port "${FASTAPI_PORT}"
