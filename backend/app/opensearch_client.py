@@ -2,6 +2,7 @@ from models import LogEntry, LogEntryInDB
 from opensearchpy import OpenSearch
 from typing import List, Optional
 from datetime import datetime, timezone
+from opensearchpy.exceptions import NotFoundError
 import os
 
 client: OpenSearch = OpenSearch(
@@ -32,7 +33,11 @@ def index_log(log_data: LogEntry) -> dict:
 
 
 def search_logs(
-    q: Optional[str] = None, level: Optional[str] = None, service: Optional[str] = None
+    q: Optional[str] = None,
+    level: Optional[str] = None,
+    service: Optional[str] = None,
+    page: int = 1,
+    size: int = 20,
 ) -> List[LogEntryInDB]:
     """
     Search log entries in OpenSearch based on optional filters.
@@ -45,6 +50,7 @@ def search_logs(
     Returns:
         List[LogEntryInDB]: A list of matching log entries.
     """
+    from_ = (page - 1) * size
     today: str = datetime.now(timezone.utc).strftime("%Y.%m.%d")
     index_name: str = f"logs-{today}"
 
@@ -65,11 +71,16 @@ def search_logs(
     query_body = {
         "query": query,
         "sort": [{"timestamp": {"order": "desc"}}],
-        "size": 20,
+        "from": from_,
+        "size": size,
     }
 
-    response = client.search(index=index_name, body=query_body)
-    return [
-        LogEntryInDB(**hit["_source"], id=hit["_id"])
-        for hit in response["hits"]["hits"]
-    ]
+    try:
+        response = client.search(index=index_name, body=query_body)
+        return [
+            LogEntryInDB(**hit["_source"], id=hit["_id"])
+            for hit in response["hits"]["hits"]
+        ]
+    except NotFoundError:
+        # L'index du jour n'existe pas (aucun log écrit)
+        return []

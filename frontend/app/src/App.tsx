@@ -18,6 +18,9 @@ function App(): JSX.Element {
   const [filterLevel, setFilterLevel] = useState<LogLevel | "">("");
   const [filterService, setFilterService] = useState<string>("");
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(20);
+
   const debouncedSearch = useDebounce(search, 500);
 
   // Fetch GET logs
@@ -26,7 +29,10 @@ function App(): JSX.Element {
     setError(null);
 
     try {
-      const params: Record<string, string> = {};
+      const params: Record<string, string | number> = {
+        page: currentPage,
+        size: pageSize,
+      };
       if (debouncedSearch.trim()) params.q = debouncedSearch.trim();
       if (filterLevel) params.level = filterLevel;
       if (filterService) params.service = filterService;
@@ -45,7 +51,7 @@ function App(): JSX.Element {
     } finally {
       setLoading(false);
     }
-  }, [debouncedSearch, filterLevel, filterService]);
+  }, [debouncedSearch, filterLevel, filterService, currentPage, pageSize]);
 
   useEffect(() => {
     fetchLogs();
@@ -65,6 +71,25 @@ function App(): JSX.Element {
       />
 
       <LogList logs={logs} loading={loading} error={error} />
+      {/* Pagination Controls */}
+      <div className="flex justify-center gap-4 my-4">
+        <button
+          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+          disabled={currentPage === 1}
+          className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+        >
+          ← Précédent
+        </button>
+
+        <span>Page {currentPage}</span>
+
+        <button
+          onClick={() => setCurrentPage((prev) => prev + 1)}
+          className="px-4 py-2 bg-gray-200 rounded"
+        >
+          Suivant →
+        </button>
+      </div>
 
       <LogForm onSubmitSuccess={fetchLogs} />
     </div>
