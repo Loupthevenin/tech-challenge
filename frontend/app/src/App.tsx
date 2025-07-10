@@ -10,6 +10,7 @@ import { useDebounce } from "./hooks/useDebounce";
 import type { JSX } from "react/jsx-dev-runtime";
 import { DateRangeFilter } from "./components/DateRangeFilter";
 import { PaginationControls } from "./components/PaginationControls";
+import Dashboard from "./components/Dashboard";
 
 function App(): JSX.Element {
   const [logs, setLogs] = useState<LogEntry[]>([]);
@@ -103,6 +104,9 @@ function App(): JSX.Element {
 
       {/* Form to submit a new log entry */}
       <LogForm onSubmitSuccess={fetchLogs} />
+
+      {/* Dashboard */}
+      <Dashboard />
     </div>
   );
 }

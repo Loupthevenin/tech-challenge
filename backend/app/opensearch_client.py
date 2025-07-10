@@ -94,3 +94,20 @@ def search_logs(
     except NotFoundError:
         # L'index du jour n'existe pas (aucun log écrit)
         return []
+
+
+def get_logs_stats() -> dict:
+    today: str = datetime.now(timezone.utc).strftime("%Y.%m.%d")
+    index_name: str = f"logs-{today}"
+
+    query_body = {
+        "size": 0,
+        "aggs": {"levels": {"terms": {"field": "level.keyword"}}},
+    }
+
+    try:
+        response = client.search(index=index_name, body=query_body)
+        buckets = response["aggregations"]["levels"]["buckets"]
+        return {bucket["key"]: bucket["doc_count"] for bucket in buckets}
+    except NotFoundError:
+        return {}

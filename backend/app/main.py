@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from typing import Optional, List
 from models import LogEntry, LogEntryCreate, LogEntryInDB
 from datetime import datetime, timezone
-from opensearch_client import index_log, search_logs
+from opensearch_client import get_logs_stats, index_log, search_logs
 
 app: FastAPI = FastAPI()
 
@@ -67,3 +67,9 @@ def search(
         end_date=end_date,
     )
     return [LogEntry(**r.model_dump(exclude={"id"})) for r in results]
+
+
+@app.get("/logs/stats")
+def stats() -> dict:
+    results = get_logs_stats()
+    return results
