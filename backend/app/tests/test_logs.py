@@ -55,7 +55,8 @@ def test_empty_message(client):
     assert response.status_code == 422
 
 
-def test_long_service_name(client):
+@patch("main.index_log", return_value={"_id": "fake-id-123"})
+def test_long_service_name(mock_index_log, client):
     payload = {
         "level": "ERROR",
         "message": "Service long test",
@@ -65,8 +66,11 @@ def test_long_service_name(client):
     response = client.post("/logs", json=payload)
     assert response.status_code == 200
 
+    mock_index_log.assert_called_once()
 
-def test_timestamp_is_auto_generated(client):
+
+@patch("main.index_log", return_value={"_id": "fake-id-123"})
+def test_timestamp_is_auto_generated(mock_index_log, client):
     payload = {
         "level": "INFO",
         "message": "Auto-timestamp test",
@@ -80,3 +84,5 @@ def test_timestamp_is_auto_generated(client):
     from datetime import datetime
 
     datetime.fromisoformat(data["timestamp"])
+
+    mock_index_log.assert_called_once()
