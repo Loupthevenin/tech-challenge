@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { VITE_API_BASE_URL } from "./config";
+import { VITE_API_BASE_URL, VITE_API_WS_URL } from "./config";
 import type { LogEntry, LogLevel } from "./types";
 import axios from "axios";
 
@@ -27,8 +27,7 @@ function App(): JSX.Element {
   const [endDate, setEndDate] = useState<string>("");
 
   useEffect(() => {
-    // TODO: var d'env ws !
-    const socket = new WebSocket("ws://localhost:8000/ws/logs");
+    const socket = new WebSocket(`${VITE_API_WS_URL}/ws/logs`);
 
     socket.onopen = () => {
       console.log("✅ WebSocket connected");
