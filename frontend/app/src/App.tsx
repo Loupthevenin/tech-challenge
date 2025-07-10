@@ -26,6 +26,28 @@ function App(): JSX.Element {
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
 
+  useEffect(() => {
+    // TODO: var d'env ws !
+    const socket = new WebSocket("ws://localhost:8000/ws/logs");
+
+    socket.onopen = () => {
+      console.log("✅ WebSocket connected");
+    };
+
+    socket.onmessage = (event) => {
+      const newLog: LogEntry = JSON.parse(event.data);
+      setLogs((prevLogs) => [newLog, ...prevLogs]);
+    };
+
+    socket.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
+
+    return () => {
+      socket.close();
+    };
+  }, []);
+
   // Fetch GET logs
   const fetchLogs = useCallback(async () => {
     setLoading(true);

@@ -1,5 +1,7 @@
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi import WebSocket, WebSocketDisconnect
+from fastapi.encoders import jsonable_encoder
 from typing import Optional, List
 from models import LogEntry, LogEntryCreate, LogEntryInDB
 from datetime import datetime, timezone
@@ -17,8 +19,37 @@ app.add_middleware(
 )
 
 
+class ConnectionManager:
+    def __init__(self):
+        self.active_connections: List[WebSocket] = []
+
+    async def connect(self, websocket: WebSocket):
+        await websocket.accept()
+        self.active_connections.append(websocket)
+
+    def disconnect(self, websocket: WebSocket):
+        self.active_connections.remove(websocket)
+
+    async def broadcast(self, message: dict):
+        for connection in self.active_connections:
+            await connection.send_json(message)
+
+
+manager = ConnectionManager()
+
+
+@app.websocket("/ws/logs")
+async def websocket_logs_endpoint(websocket: WebSocket):
+    await manager.connect(websocket)
+    try:
+        while True:
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        manager.disconnect(websocket)
+
+
 @app.post("/logs", response_model=LogEntryInDB)
-def ingest_log(log: LogEntryCreate) -> LogEntryInDB:
+async def ingest_log(log: LogEntryCreate) -> LogEntryInDB:
     """
     Ingest a new log entry and index it into OpenSearch.
 
@@ -30,6 +61,7 @@ def ingest_log(log: LogEntryCreate) -> LogEntryInDB:
     """
     log_data: LogEntry = LogEntry(**log.dict(), timestamp=datetime.now(timezone.utc))
     result = index_log(log_data=log_data.dict())
+    await manager.broadcast(jsonable_encoder(log_data.dict()))
     return LogEntryInDB(id=result["_id"], **log_data.dict())
 
 

@@ -18,7 +18,7 @@ export default function LogList({
           className="border rounded p-3 flex flex-col sm:flex-row sm:justify-between bg-gray-50"
         >
           <span className="font-mono text-sm text-gray-600">
-            {log.timestamp}
+            {new Date(log.timestamp).toISOString().replace("T", " ")}
           </span>
           <span
             className={`font-bold px-2 rounded ${
