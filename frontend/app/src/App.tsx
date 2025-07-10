@@ -9,20 +9,21 @@ import LogForm from "./components/LogForm";
 import { useDebounce } from "./hooks/useDebounce";
 import type { JSX } from "react/jsx-dev-runtime";
 import { DateRangeFilter } from "./components/DateRangeFilter";
+import { PaginationControls } from "./components/PaginationControls";
 
 function App(): JSX.Element {
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState<string>("");
   const debouncedSearch = useDebounce(search, 500);
   const [filterLevel, setFilterLevel] = useState<LogLevel | "">("");
   const [filterService, setFilterService] = useState<string>("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize] = useState(20);
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [pageSize] = useState<number>(20);
+  const [startDate, setStartDate] = useState<string>("");
+  const [endDate, setEndDate] = useState<string>("");
 
   // Fetch GET logs
   const fetchLogs = useCallback(async () => {
@@ -70,8 +71,10 @@ function App(): JSX.Element {
 
   return (
     <div className="max-w-4xl mx-auto p-4 font-sans">
+      {/* Main page title */}
       <h1 className="text-3xl font-bold mb-4">Logs Viewer</h1>
 
+      {/* Filters for text search, log level, and service name */}
       <LogFilters
         search={search}
         setSearch={setSearch}
@@ -81,7 +84,7 @@ function App(): JSX.Element {
         setFilterService={setFilterService}
       />
 
-      {/*Date Range Filter*/}
+      {/* Date range filter to filter logs between two dates */}
       <DateRangeFilter
         startDate={startDate}
         endDate={endDate}
@@ -89,27 +92,16 @@ function App(): JSX.Element {
         setEndDate={setEndDate}
       />
 
+      {/* List of logs with loading and error handling */}
       <LogList logs={logs} loading={loading} error={error} />
-      {/* Pagination Controls */}
-      <div className="flex justify-center gap-4 my-4">
-        <button
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
-          className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
-        >
-          ← Précédent
-        </button>
 
-        <span>Page {currentPage}</span>
+      {/* Pagination controls to navigate through pages */}
+      <PaginationControls
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+      />
 
-        <button
-          onClick={() => setCurrentPage((prev) => prev + 1)}
-          className="px-4 py-2 bg-gray-200 rounded"
-        >
-          Suivant →
-        </button>
-      </div>
-
+      {/* Form to submit a new log entry */}
       <LogForm onSubmitSuccess={fetchLogs} />
     </div>
   );

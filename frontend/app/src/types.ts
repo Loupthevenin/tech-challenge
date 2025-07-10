@@ -32,6 +32,11 @@ export interface LogFiltersProps {
   setFilterService: (val: string) => void;
 }
 
+export interface PaginationControlsProps {
+  currentPage: number;
+  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
+}
+
 export interface DateRangeFilterProps {
   startDate: string;
   endDate: string;
