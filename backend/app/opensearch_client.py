@@ -38,6 +38,8 @@ def search_logs(
     service: Optional[str] = None,
     page: int = 1,
     size: int = 20,
+    start_date: Optional[datetime] = None,
+    end_date: Optional[datetime] = None,
 ) -> List[LogEntryInDB]:
     """
     Search log entries in OpenSearch based on optional filters.
@@ -62,6 +64,14 @@ def search_logs(
         must.append({"term": {"level.keyword": level}})
     if service:
         must.append({"term": {"service.keyword": service}})
+
+    if start_date or end_date:
+        date_range = {}
+        if start_date:
+            date_range["gte"] = start_date.isoformat()
+        if end_date:
+            date_range["lte"] = end_date.isoformat()
+        must.append({"range": {"timestamp": date_range}})
 
     if not must:
         query = {"match_all": {}}

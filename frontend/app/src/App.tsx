@@ -8,6 +8,7 @@ import LogList from "./components/LogList";
 import LogForm from "./components/LogForm";
 import { useDebounce } from "./hooks/useDebounce";
 import type { JSX } from "react/jsx-dev-runtime";
+import { DateRangeFilter } from "./components/DateRangeFilter";
 
 function App(): JSX.Element {
   const [logs, setLogs] = useState<LogEntry[]>([]);
@@ -15,13 +16,13 @@ function App(): JSX.Element {
   const [error, setError] = useState<string | null>(null);
 
   const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 500);
   const [filterLevel, setFilterLevel] = useState<LogLevel | "">("");
   const [filterService, setFilterService] = useState<string>("");
-
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(20);
-
-  const debouncedSearch = useDebounce(search, 500);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
   // Fetch GET logs
   const fetchLogs = useCallback(async () => {
@@ -36,6 +37,8 @@ function App(): JSX.Element {
       if (debouncedSearch.trim()) params.q = debouncedSearch.trim();
       if (filterLevel) params.level = filterLevel;
       if (filterService) params.service = filterService;
+      if (startDate) params.start_date = new Date(startDate).toISOString();
+      if (endDate) params.end_date = new Date(endDate).toISOString();
 
       const response = await axios.get<LogEntry[]>(
         `${VITE_API_BASE_URL}/logs/search`,
@@ -51,7 +54,15 @@ function App(): JSX.Element {
     } finally {
       setLoading(false);
     }
-  }, [debouncedSearch, filterLevel, filterService, currentPage, pageSize]);
+  }, [
+    debouncedSearch,
+    filterLevel,
+    filterService,
+    currentPage,
+    pageSize,
+    startDate,
+    endDate,
+  ]);
 
   useEffect(() => {
     fetchLogs();
@@ -68,6 +79,14 @@ function App(): JSX.Element {
         setFilterLevel={setFilterLevel}
         filterService={filterService}
         setFilterService={setFilterService}
+      />
+
+      {/*Date Range Filter*/}
+      <DateRangeFilter
+        startDate={startDate}
+        endDate={endDate}
+        setStartDate={setStartDate}
+        setEndDate={setEndDate}
       />
 
       <LogList logs={logs} loading={loading} error={error} />

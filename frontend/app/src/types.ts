@@ -31,3 +31,10 @@ export interface LogFiltersProps {
   filterService: string;
   setFilterService: (val: string) => void;
 }
+
+export interface DateRangeFilterProps {
+  startDate: string;
+  endDate: string;
+  setStartDate: (date: string) => void;
+  setEndDate: (date: string) => void;
+}

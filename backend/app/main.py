@@ -28,8 +28,7 @@ def ingest_log(log: LogEntryCreate) -> LogEntryInDB:
     Returns:
         LogEntryInDB: The indexed log entry, including the generated ID.
     """
-    log_data: LogEntry = LogEntry(
-        **log.dict(), timestamp=datetime.now(timezone.utc))
+    log_data: LogEntry = LogEntry(**log.dict(), timestamp=datetime.now(timezone.utc))
     result = index_log(log_data=log_data.dict())
     return LogEntryInDB(id=result["_id"], **log_data.dict())
 
@@ -44,6 +43,8 @@ def search(
         ge=1,
     ),
     size: int = Query(20, ge=1, le=100),
+    start_date: Optional[datetime] = Query(None),
+    end_date: Optional[datetime] = Query(None),
 ) -> List[LogEntry]:
     """
     Search logs in OpenSearch using optional filters.
@@ -57,6 +58,12 @@ def search(
         List[LogEntry]: List of matching logs without OpenSearch metadata.
     """
     results: List[LogEntryInDB] = search_logs(
-        q=q, level=level, service=service, page=page, size=size
+        q=q,
+        level=level,
+        service=service,
+        page=page,
+        size=size,
+        start_date=start_date,
+        end_date=end_date,
     )
     return [LogEntry(**r.model_dump(exclude={"id"})) for r in results]
