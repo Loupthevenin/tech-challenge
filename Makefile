@@ -68,6 +68,18 @@ k8s-apply: check-k8s
 	minikube image load frontend:latest
 	kubectl apply -f $(K8S_DIR)/frontend
 
+k8s-port-forward:
+	@echo "$(CYAN)⏩ Port forwarding...$(END)"
+	@echo "Backend: http://localhost:8000"
+	@kubectl port-forward svc/fastapi-backend 8000:8000 &
+	@echo "Frontend: http://localhost:3000"
+	@kubectl port-forward svc/frontend 3000:3000 &
+	@sleep 2
+
+k8s-stop-forward:
+	@echo "$(RED)🛑 Stopping all port-forward processes...$(END)"
+	@pkill -f "kubectl port-forward" || true
+
 k8s-delete:
 	@echo "$(RED)Deleting all Kubernetes resources...$(END)"
 	kubectl delete -f $(K8S_DIR)/frontend || true
