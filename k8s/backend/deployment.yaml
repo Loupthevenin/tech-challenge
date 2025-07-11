@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fastapi-backend-config
+data:
+  OPENSEARCH_HOST: "opensearch"
+  OPENSEARCH_PORT: "9200"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastapi-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fastapi-backend
+  template:
+    metadata:
+      labels:
+        app: fastapi-backend
+    spec:
+      containers:
+        - name: backend
+          image: fastapi-backend:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8000
+          env:
+            - name: OPENSEARCH_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: fastapi-backend-config
+                  key: OPENSEARCH_HOST
+            - name: OPENSEARCH_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: fastapi-backend-config
+                  key: OPENSEARCH_PORT
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fastapi-backend
+spec:
+  selector:
+    app: fastapi-backend
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000

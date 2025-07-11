@@ -1,0 +1,20 @@
+FROM python:3.11-slim
+
+ARG OPENSEARCH_HOST
+ARG OPENSEARCH_PORT
+ENV OPENSEARCH_HOST=$OPENSEARCH_HOST
+ENV OPENSEARCH_PORT=$OPENSEARCH_PORT
+
+RUN apt update -y && apt upgrade -y && apt install -y \
+	curl \
+    && apt clean
+
+WORKDIR /app
+
+COPY ./app .
+
+RUN pip install --upgrade pip && pip install --no-cache-dir -r /app/requirements.txt
+
+EXPOSE 8000
+
+CMD ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
