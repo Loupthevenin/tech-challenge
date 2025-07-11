@@ -48,6 +48,10 @@ def search_logs(
         q (Optional[str]): Full-text search on the message field.
         level (Optional[str]): Filter by log level (e.g., INFO, ERROR).
         service (Optional[str]): Filter by service name.
+        page (int): Page number for pagination (default: 1).
+        size (int): Number of results per page (default: 20).
+        start_date (Optional[datetime]): Filter logs starting from this date.
+        end_date (Optional[datetime]): Filter logs up to this date.
 
     Returns:
         List[LogEntryInDB]: A list of matching log entries.
@@ -97,6 +101,13 @@ def search_logs(
 
 
 def get_logs_stats() -> dict:
+    """
+    Query OpenSearch to aggregate log counts by their level for today.
+
+    Returns:
+        dict: Mapping of log level names to the number of log entries.
+              Returns an empty dict if no logs are found for today.
+    """
     today: str = datetime.now(timezone.utc).strftime("%Y.%m.%d")
     index_name: str = f"logs-{today}"
 

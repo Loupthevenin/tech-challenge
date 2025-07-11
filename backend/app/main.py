@@ -87,6 +87,10 @@ def search(
         q (Optional[str]): Full-text search on the message field.
         level (Optional[str]): Filter by log level (INFO, ERROR, etc.).
         service (Optional[str]): Filter by service name.
+        page (int): Page number for pagination (default: 1).
+        size (int): Number of results per page (default: 20, max: 100).
+        start_date (Optional[datetime]): Filter logs starting from this date.
+        end_date (Optional[datetime]): Filter logs up to this date.
 
     Returns:
         List[LogEntry]: List of matching logs without OpenSearch metadata.
@@ -105,5 +109,11 @@ def search(
 
 @app.get("/logs/stats")
 def stats() -> dict:
+    """
+    Retrieve aggregated statistics of log levels for today's logs.
+
+    Returns:
+        dict: A dictionary mapping log levels (e.g., INFO, ERROR) to their counts.
+    """
     results = get_logs_stats()
     return results
