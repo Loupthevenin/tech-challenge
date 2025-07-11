@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.backend.name }}-config
+data:
+  OPENSEARCH_HOST: {{ .Values.backend.config.OPENSEARCH_HOST | quote }}
+  OPENSEARCH_PORT: {{ .Values.backend.config.OPENSEARCH_PORT | quote }}
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.backend.name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.backend.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.backend.name }}
+    spec:
+      containers:
+        - name: backend
+          image: "{{ .Values.backend.image.repository }}:{{ .Values.backend.image.tag }}"
+          imagePullPolicy: {{ .Values.backend.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.backend.port }}
+          env:
+            - name: OPENSEARCH_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.backend.name }}-config
+                  key: OPENSEARCH_HOST
+            - name: OPENSEARCH_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: {{ .Values.backend.name }}-config
+                  key: OPENSEARCH_PORT
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.backend.name }}
+spec:
+  selector:
+    app: {{ .Values.backend.name }}
+  ports:
+    - protocol: TCP
+      port: {{ .Values.backend.port }}
+      targetPort: {{ .Values.backend.port }}
+

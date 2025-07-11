@@ -80,6 +80,21 @@ k8s-logs:
 k8s-status:
 	kubectl get all
 
+
+# Helm
+
+helm-deploy:
+	@echo "🚀 Deploying app with Helm..."
+	helm upgrade --install helm ./helm
+
+helm-package:
+	@echo "📦 Packaging Helm chart..."
+	helm package ./helm
+
+helm-delete:
+	@echo "🗑️ Deleting Helm release..."
+	helm uninstall helm
+
 clean:
 	@echo "$(YELLOW)Stopping and removing Docker...$(END)"
 	@$(DOCKER) down -v --remove-orphans --rmi all
@@ -92,4 +107,4 @@ clean:
 
 	@echo "$(GREEN)Cleanup complete!$(END)"
 
-.PHONY: all up down logs k8s-apply k8s-delete k8s-logs k8s-status clean
+.PHONY: all up down logs k8s-apply k8s-delete k8s-logs k8s-status helm-deploy helm-package helm-delete clean

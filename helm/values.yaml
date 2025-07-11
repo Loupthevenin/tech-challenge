@@ -1,0 +1,35 @@
+opensearch:
+  name: opensearch
+  replicaCount: 1
+  image:
+    repository: opensearchproject/opensearch
+    tag: 2.11.1
+  javaOpts: "-Xms512m -Xmx512m"
+  ports:
+    - name: http
+      containerPort: 9200
+      servicePort: 9200
+    - name: metrics
+      containerPort: 9600
+      servicePort: 9600
+
+backend:
+  name: fastapi-backend
+  image:
+    repository: fastapi-backend
+    tag: latest
+    pullPolicy: Never
+  port: 8000
+  config:
+    OPENSEARCH_HOST: "opensearch"
+    OPENSEARCH_PORT: "9200"
+
+frontend:
+  name: frontend
+  image:
+    repository: frontend
+    tag: latest
+    pullPolicy: Never
+  port: 3000
+  service:
+    type: LoadBalancer

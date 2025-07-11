@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.opensearch.name }}
+  labels:
+    app: {{ .Values.opensearch.name }}
+spec:
+  replicas: {{ .Values.opensearch.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.opensearch.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.opensearch.name }}
+    spec:
+      containers:
+        - name: {{ .Values.opensearch.name }}
+          image: "{{ .Values.opensearch.image.repository }}:{{ .Values.opensearch.image.tag }}"
+          ports:
+            {{- range .Values.opensearch.ports }}
+            - name: {{ .name }}
+              containerPort: {{ .containerPort }}
+            {{- end }}
+          env:
+            - name: discovery.type
+              value: "single-node"
+            - name: DISABLE_SECURITY_PLUGIN
+              value: "true"
+            - name: OPENSEARCH_JAVA_OPTS
+              value: "{{ .Values.opensearch.javaOpts }}"
+          volumeMounts:
+            - name: opensearch-data
+              mountPath: /usr/share/opensearch/data
+      volumes:
+        - name: opensearch-data
+          emptyDir: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.opensearch.name }}
+  labels:
+    app: {{ .Values.opensearch.name }}
+spec:
+  selector:
+    app: {{ .Values.opensearch.name }}
+  ports:
+    {{- range .Values.opensearch.ports }}
+    - name: {{ .name }}
+      port: {{ .servicePort }}
+      targetPort: {{ .containerPort }}
+    {{- end }}
