@@ -92,42 +92,44 @@ function App(): JSX.Element {
   }, [fetchLogs]);
 
   return (
-    <div className="max-w-4xl mx-auto p-4 font-sans">
-      {/* Main page title */}
-      <h1 className="text-3xl font-bold mb-4">Logs Viewer</h1>
+    <div className="min-h-screen bg-gray-900 text-gray-100 flex justify-center items-center p-4 font-sans">
+      <div className="max-w-4xl w-full bg-gray-800 p-8 rounded shadow-lg">
+        {/* Main page title */}
+        <h1 className="text-3xl font-bold mb-4">Logs Viewer</h1>
 
-      {/* Filters for text search, log level, and service name */}
-      <LogFilters
-        search={search}
-        setSearch={setSearch}
-        filterLevel={filterLevel}
-        setFilterLevel={setFilterLevel}
-        filterService={filterService}
-        setFilterService={setFilterService}
-      />
+        {/* Filters for text search, log level, and service name */}
+        <LogFilters
+          search={search}
+          setSearch={setSearch}
+          filterLevel={filterLevel}
+          setFilterLevel={setFilterLevel}
+          filterService={filterService}
+          setFilterService={setFilterService}
+        />
 
-      {/* Date range filter to filter logs between two dates */}
-      <DateRangeFilter
-        startDate={startDate}
-        endDate={endDate}
-        setStartDate={setStartDate}
-        setEndDate={setEndDate}
-      />
+        {/* Date range filter to filter logs between two dates */}
+        <DateRangeFilter
+          startDate={startDate}
+          endDate={endDate}
+          setStartDate={setStartDate}
+          setEndDate={setEndDate}
+        />
 
-      {/* List of logs with loading and error handling */}
-      <LogList logs={logs} loading={loading} error={error} />
+        {/* List of logs with loading and error handling */}
+        <LogList logs={logs} loading={loading} error={error} />
 
-      {/* Pagination controls to navigate through pages */}
-      <PaginationControls
-        currentPage={currentPage}
-        setCurrentPage={setCurrentPage}
-      />
+        {/* Pagination controls to navigate through pages */}
+        <PaginationControls
+          currentPage={currentPage}
+          setCurrentPage={setCurrentPage}
+        />
 
-      {/* Form to submit a new log entry */}
-      <LogForm onSubmitSuccess={fetchLogs} />
+        {/* Form to submit a new log entry */}
+        <LogForm onSubmitSuccess={fetchLogs} />
 
-      {/* Dashboard */}
-      <Dashboard />
+        {/* Dashboard */}
+        <Dashboard />
+      </div>
     </div>
   );
 }

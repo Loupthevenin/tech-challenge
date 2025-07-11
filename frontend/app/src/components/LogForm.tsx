@@ -42,7 +42,7 @@ export default function LogForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="border p-4 rounded space-y-4 max-w-md"
+      className="border p-4 rounded space-y-4 max-w-md w-full mx-auto"
     >
       <h2 className="text-xl font-semibold mb-3">Submit a new log</h2>
 

@@ -57,11 +57,13 @@ export default function Dashboard() {
   if (!data) return null;
 
   return (
-    <div className="w-full max-w-md mx-auto">
+    <div className="w-full p-4 max-w-md mx-auto">
       <h2 className="text-xl font-bold text-center mb-4">
         Répartition des logs
       </h2>
-      <Pie data={data} />
+      <div className="flex justify-center">
+        <Pie data={data} />
+      </div>
     </div>
   );
 }

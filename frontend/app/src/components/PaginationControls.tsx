@@ -6,20 +6,20 @@ export function PaginationControls({
   setCurrentPage,
 }: PaginationControlsProps): JSX.Element {
   return (
-    <div className="flex justify-center gap-4 my-4">
+    <div className="flex justify-center gap-4 my-6">
       <button
         onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
         disabled={currentPage === 1}
-        className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
+        className="px-4 py-2 rounded-md bg-gray-200 text-gray-700 disabled:opacity-50 hover:bg-gray-300 transition"
       >
         ← Précédent
       </button>
 
-      <span>Page {currentPage}</span>
+      <span className="font-medium text-gray-700">Page {currentPage}</span>
 
       <button
         onClick={() => setCurrentPage((prev) => prev + 1)}
-        className="px-4 py-2 bg-gray-200 rounded"
+        className="px-4 py-2 rounded-md bg-gray-200 text-gray-700 hover:bg-gray-300 transition"
       >
         Suivant →
       </button>
