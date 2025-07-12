@@ -28,7 +28,6 @@ export default function LogForm({
 
     try {
       await axios.post(`${VITE_API_BASE_URL}/logs`, newLog);
-      alert("Log submitted");
       setNewLog({
         ...INITIAL_LOG,
       });
